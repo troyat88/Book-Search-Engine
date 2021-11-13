@@ -1,3 +1,5 @@
+//remove saveBook from api and replace w SAVE_BOOK mutation
+
 import React, { useState, useEffect } from 'react';
 import { Jumbotron, Container, Col, Form, Button, Card, CardColumns } from 'react-bootstrap';
 
@@ -5,7 +7,12 @@ import Auth from '../utils/auth';
 import { saveBook, searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
+import { useMutation } from '@apollo/client';
+import { SAVE_BOOK } from '../utils/mutations';
+
 const SearchBooks = () => {
+  // USE MUTATION HOOK 
+  const [savebook] = useMutation(SAVE_BOOK)
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
@@ -65,7 +72,7 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
+      const response = await SAVE_BOOK({variables: {book:bookToSave }}); //use mutation and pass values needed as variables
 
       if (!response.ok) {
         throw new Error('something went wrong!');
