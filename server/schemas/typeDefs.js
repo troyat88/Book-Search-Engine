@@ -3,7 +3,7 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   # Define which fields are/create an 'input' type 
 
-  type BookInput {  
+  input BookInput {  
     authors: [String!]
     description: String!
     title: String!
