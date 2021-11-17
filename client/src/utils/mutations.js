@@ -13,7 +13,7 @@ export const LOGIN_USER = gql`
         savedBooks {
           bookId
           authors
-          descritpion
+          description
           title
           image
 
@@ -35,7 +35,7 @@ export const ADD_USER = gql`
       savedBooks{
           bookId
           authors
-          descritpion
+          description
           title
           image
       }
