@@ -1,5 +1,3 @@
-// Why is AuthError not working(check syntax)
-
 
 const { signToken } = require('../utils/auth');
 const { User } = require('../models');
@@ -10,9 +8,13 @@ const { AuthenticationError } = require('apollo-server-express');
 const resolvers = {
     Query: {
         me: async (parent, args, { user }) => {
+          if (user) {
             // find user and associated saved books
             return await User.findOne({ _id: user._id }).populate('savedBooks');
+          }
+          throw new AuthenticationError ('Please login')
         }
+        
             
     },
 
@@ -22,7 +24,9 @@ const resolvers = {
 
         login: async (parent, { email, password }) => {
         // Look up the user by the provided email address. Since the `email` field is unique, we know that only one person will exist with that email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email });
+        const token = signToken(user);
+        return {token, user};
         },
         addUser: async (parent, { username, email, password }) => {
             // First we create the user
@@ -33,26 +37,46 @@ const resolvers = {
             return { token, user };
           },
 
-          saveBook: async (parent, { user}, {book}) => {
-            return User.findOneAndUpdate(
+          saveBook: async (parent, { book }, { user }) => {
+            try { 
+              if (user){
+                const updatedUser = await User.findOneAndUpdate(
               { id: user._id },
               { $addToSet: { savedBooks: book } },
               {
                 new: true,
                 runValidators: true,
               }
-            );  
-            },
+            );
+            return updatedUser;  
+            }
+          }catch (err){
+            console.log(err);
+            throw new AuthenticationError('${err}');
+          }
+        },
+
+
 
             removeBook: async (parent, { bookId }, {user}) => {
-                return User.findOneAndUpdate(
+              try{
+                const updatedUser = await User.findOneAndUpdate(
                   { _id: user._id },
                   { $pull: { savedBooks: { bookId: bookId } } },
                   { new: true }
                 );
-              },
+                if(!updatedUser){
+                  throw new AuthenticationError('No user with this ID');
+                }
+                return updatedUser;
+              }catch(err){
+                console.log(err);
+                throw new AuthenticationError('${err}');
+              }
+            },
 
 },
+
 }
 
     module.exports = resolvers;
