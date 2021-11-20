@@ -72,7 +72,7 @@ const SearchBooks = () => {
     }
 
     try {
-       await saveBook({variables: {book: bookToSave }}); //use mutation and pass values needed as variables
+       await saveBook({variables: { book: bookToSave }}); //use mutation and pass values needed as variables
 
       
 
