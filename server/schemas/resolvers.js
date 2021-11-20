@@ -7,10 +7,10 @@ const { AuthenticationError } = require('apollo-server-express');
 // Create the functions that fulfill the queries defined in `typeDefs.js`
 const resolvers = {
     Query: {
-        me: async (parent, args, {user} ) => {
-          if (user) {
+        me: async (parent, args, context ) => {
+          if (context.user) {
             // find user and associated saved books
-            return User.findOne({ _id: user._id }).populate(savedBooks);
+            return User.findOne({ _id: context.user._id }).populate('books');
           }
           throw new AuthenticationError ('Please login');
         },
